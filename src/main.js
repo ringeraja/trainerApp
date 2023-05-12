@@ -11,6 +11,7 @@ import BaseSpinner from './components/ui/BaseSpinner.vue';
 //import BaseDialog from './components/ui/BaseDialog.vue'; async cmp
 import GreenCube from './components/ui/GreenCube.vue';
 import TheMenu from './components/layout/TheMenu.vue';
+import ExerciseCmp from './components/layout/ExerciseCmp.vue';
 
 const BaseDialog = defineAsyncComponent( () => import('./components/ui/BaseDialog.vue'));
 
@@ -29,5 +30,6 @@ app.component('base-spinner',BaseSpinner);
 app.component('base-dialog',BaseDialog);
 app.component('green-cube',GreenCube);
 app.component('the-menu',TheMenu);
+app.component('exercise-cmp',ExerciseCmp);
 
 app.mount('#app');

@@ -1,9 +1,14 @@
 <template>
+<div>
   <div class="holder">
     <div>
         <h2>Composition API Practise</h2>
-        <p>{{ username }}</p>
-        <p>{{ userage }}</p>
+        <user-data :last-name="lastName" :first-name="firstName"></user-data>
+    </div>
+    <div>
+      <input class='input' type="text" placeholder="First name" v-model="firstName">
+      <input class='input' type="text" placeholder="Last name" ref="lastNameInput">
+      <button @click="setLastName">Set last name</button>
     </div>
     <div class="card">
       <h2>{{ user.name }}</h2>
@@ -11,56 +16,116 @@
     </div>
     <button @click="setAge">Change Age</button>
   </div>
+  <div class="holder">
+    <div>
+        <h2>My Course Goal</h2>
+        <!-- Task 1: Output your main course goal with help of the composition API -->
+        <!-- Don't hardcode it into the template, instead hardcode it into the JS code -->
+        <h3 v-if="reactiveCourseData.goalVisibility">{{goal}}</h3>
+        <!-- Task 2: Toggle (show/ hide) the goal with help of the button  -->
+        <button @click="toggleGoalVisibility">Toggle Goal</button>
+        <!-- Task 3: Manage data in three ways -->
+        <!-- => Separate refs -->
+        <!-- => Ref Object -->
+        <!-- => Reactive Object -->
+        <!-- Task 4: Also solve the assignment with the Options API -->
+    </div>
+  </div>
+  <exercise-cmp></exercise-cmp>
+</div>
+
 </template>
 
 <script>
-//composition api
-//import { ref } from 'vue'; //ref works with all kinds of values including objects with .value accessing
-import { reactive,ref } from 'vue'; // reactive - is there for objects
-
+//ref works with all kinds of values including objects with .value accessing
+import { reactive,ref,computed,watch, provide } from 'vue'; // reactive - is there for objects
+import UserData from '../../components/layout/UserData.vue';
 export default {
-  //props: untouched
-  //components: untouched
+  components: {
+    UserData,
+  },
   setup() {
-    //const uName = ref('Nikola Vujicic'); //creates a reactive value, that vue is able to watch and update DOM when value is changed or used
-    const uName = ref('Tom');
     const uAge = ref(44);
     const user = reactive({
       name: 'Nikola',
       age: 26,
     });
+    const lastNameInput = ref(null);
 
+     const reactiveCourseData = reactive({
+      goal:'Finish the course.Learn vue basics!',
+      goalVisibility: false,
+    });
+
+    const firstName = ref('');
+    const lastName = ref('');
+
+    provide('user-age',uAge);//since we provide a ref it will be updated on change
+
+    const uName = computed(function(){//whenever firstName and lastName change it autoupdates
+        return firstName.value + ' ' + lastName.value;
+    });
+
+
+    watch([uAge,uName],function( newValue,oldValues){
+      console.log('Old age: ' + oldValues[0]);
+      console.log('New age: ' + newValue[0]);
+      console.log('Old name: ' + oldValues[1]);
+      console.log('New name: ' + newValue[1]);
+    });
+    
+    //const courseGoal = ref('Learn vue.js basics!'); 
+    //const goalIsVisible= ref(false);
+    // const courseData = ref({
+    //   goal:'Finish the course.Learn vue basics!',
+    //   goalVisibility: false,
+    // });
     //console.log(isRef(uAge.value));
     //console.log(isReactive(user.name), user.age);
 
     setTimeout(function () {
-      user.name = 'Max';
-      user.age = 77;
+      user.name = 'Max ';
+      user.age = 33;
     }, 3500);
 
     function setNewAge() {
-      uAge.value = 33;
+      user.age = 72;
+      uAge.value =72;
     }
+
+    function toggleGoalVisibility(){
+      //courseData.value.goalVisibility = !courseData.value.goalVisibility;
+      reactiveCourseData.goalVisibility = !reactiveCourseData.goalVisibility;
+    }
+    
+    function setLastName(){
+      //lastName.value = this.$refs.lastNameInput.value;
+      lastName.value = lastNameInput.value.value;    
+    }
+
+    
 
     //const userRefs = toRefs(user);
 
     return {
-      user: user,
-      username:uName,
-      userage:uAge,
+      user,
+      userName:uName,
+      age:uAge,
       //userName: userRefs.name,
       //userAge: userRefs.age,
       setAge: setNewAge,
-      
+      goal: reactiveCourseData.goal, //would not be reactive
+      reactiveCourseData,
+      toggleGoalVisibility,
+      firstName,
+      lastName,
+      lastNameInput,
+      setLastName
+
     }; 
   },
-
-  // data(){
-  //     return{
-  //         userName: 'Nikola',
-  //     };
-  // },
 };
+
 </script>
 
 <style scoped>
@@ -72,7 +137,7 @@ export default {
   align-items: center;
   padding: 1rem;
   margin: 2rem auto;
-  max-width: 42rem;
+  max-width: 60rem;
 }
 
 .card {
@@ -197,4 +262,34 @@ button:active {
   transition: box-shadow 0.2s ease-in;
 }
 /* Button CSS */
+
+/* input CSS */
+
+.input {
+  --input-focus: #2d8cf0;
+  --font-color: #323232;
+  --font-color-sub: #666;
+  --bg-color: #fff;
+  --main-color: #323232;
+  width: 200px;
+  height: 40px;
+  border-radius: 5px;
+  border: 2px solid var(--main-color);
+  background-color: var(--bg-color);
+  box-shadow: 4px 4px var(--main-color);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--font-color);
+  padding: 5px 10px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--font-color-sub);
+  opacity: 0.8;
+}
+
+.input:focus {
+  border: 2px solid var(--input-focus);
+}
 </style>
